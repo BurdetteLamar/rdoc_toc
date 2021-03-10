@@ -1,0 +1,21 @@
+PATH
+  remote: .
+  specs:
+    rdoc_toc (0.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    minitest (5.13.0)
+    rake (12.3.2)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  minitest (~> 5.0)
+  rake (~> 12.0)
+  rdoc_toc!
+
+BUNDLED WITH
+   2.1.4
