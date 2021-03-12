@@ -2,7 +2,7 @@ require_relative 'lib/rdoc_toc/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'rdoc_toc'
-  spec.version       = RdocToc::VERSION
+  spec.version       = RDocToc::VERSION
   spec.authors       = ['BurdetteLamar']
   spec.email         = ['burdettelamar@yahoo.com']
 

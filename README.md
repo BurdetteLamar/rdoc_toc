@@ -1,4 +1,4 @@
-# RdocToc
+# RDocToc
 
 Gem +rdoc_toc+ builds tables of contents from Ruby RDoc text.
 
@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
 
-See RdocToc.
+See RDocToc.
 
 ## Development
 
