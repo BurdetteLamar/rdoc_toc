@@ -5,28 +5,54 @@ class RDocTocTest < Minitest::Test
     refute_nil ::RDocToc::VERSION
   end
 
-  def test_good
-    %w/
-        empty
-        six_levels
-      /.each do |file_base_name|
-      do_good(file_base_name)
-    end
+  def test_empty
+    do_good('', 'empty.toc')
+  end
+
+  def test_six_levels
+    do_good(six_levels_rdoc, 'six_levels.toc')
+  end
+
+  def test_tree
+    do_good(tree_rdoc, 'tree.toc')
   end
 
   def test_title
-    do_good('title', {title: 'Contents'})
+    do_good(six_levels_rdoc, 'title.toc', {title: 'Contents'})
   end
 
-  def do_good(file_base_name, options = {})
-    rdoc_file_name = file_base_name + '.rdoc'
-    toc_file_name = file_base_name + '.toc'
-    rdoc_file_path = File.join('test', 'files', rdoc_file_name)
-    exp_toc_file_path = File.join('test', 'files', toc_file_name)
+  def six_levels_rdoc
+    <<-EOT
+= Header 1
+== Header 2
+=== Header 3
+==== Header 4
+===== Header 5
+====== Header 6
+    EOT
+  end
+
+  def tree_rdoc
+    <<-EOT
+= Header 1
+= Header 1
+= Header 1
+== Header 2
+=== Header 3
+==== Header 4
+===== Header 5
+====== Header 6
+    EOT
+  end
+
+  def do_good(rdoc_string, exp_toc_file_path, options = {})
+    exp_toc_file_path = File.join('test', 'files', exp_toc_file_path)
     Dir.mktmpdir do |tmp_dir_path|
-      act_toc_file_path = File.join(tmp_dir_path, toc_file_name)
+      rdoc_file_path = File.join(tmp_dir_path, 'input.rdoc')
+      File.write(rdoc_file_path, rdoc_string)
+      act_toc_file_path = File.join(tmp_dir_path, 'output.toc')
       RDocToc.toc(rdoc_file_path, act_toc_file_path, options)
-      assert_files(exp_toc_file_path, act_toc_file_path, file_base_name)
+      assert_files(exp_toc_file_path, act_toc_file_path, exp_toc_file_path)
     end
 
   end

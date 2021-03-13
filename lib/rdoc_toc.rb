@@ -8,9 +8,14 @@ class RDocToc
 
   def self.toc(rdoc_file_path, toc_file_path, options = {})
     default_options = {
-      title: nil
+      title: nil,
+      indentation: 0,
+      top_bullets: false,
+      linked_file_path: nil
     }
-    options = default_options.merge(options)
+    opts = default_options.merge(options)
+    values = opts.values_at(*default_options.keys)
+    title, indentation, top_bullets, linked_file_path = *values
 
     rdoc_string = File.read(rdoc_file_path)
     markup = RDoc::Markup.parse(rdoc_string)
@@ -18,18 +23,24 @@ class RDocToc
     to_label = RDoc::Markup::ToLabel.new
 
     toc_lines = []
-    if options[:title]
-      toc_lines.push("= #{options[:title]}")
-    end
+    toc_lines.push("= #{title}") if title
+
     doc.table_of_contents.each do |header|
+      indent = '  ' * (header.level - 1) * indentation
+      if (indent.size > 0) || top_bullets
+        bullet = '- '
+      else
+        bullet = ''
+      end
+
       text = header.text
-      href = to_label.convert(text)
-      indent = '  ' * (header.level - 1)
-      toc_line = "#{indent}- {#{text}}[#label-#{href}]"
+      href = "#label-#{to_label.convert(text)}"
+      href = File.join(linked_file_path, href) if linked_file_path
+      toc_line = "#{indent}#{bullet}{#{text}}[#{href}]"
       toc_lines.push(toc_line)
     end
     toc_lines.push('')
-    toc_string = toc_lines.join("\n")
+    toc_string = toc_lines.join($/)
     File.write(toc_file_path, toc_string)
   end
 
