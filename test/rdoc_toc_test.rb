@@ -35,13 +35,19 @@ class RDocTocTest < Minitest::Test
   def tree_rdoc
     <<-EOT
 = Header 1
-= Header 1
-= Header 1
-== Header 2
-=== Header 3
-==== Header 4
-===== Header 5
-====== Header 6
+== Header 1.1
+=== Header 1.1.1
+=== Header 1.1.2
+== Header 1.2
+=== Header 1.2.1
+=== Header 1.2.2
+= Header 2
+== Header 2.1
+=== Header 2.1.1
+=== Header 2.1.2
+== Header 2.2
+=== Header 2.2.1
+=== Header 2.2.2
     EOT
   end
 
