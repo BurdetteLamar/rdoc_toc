@@ -21,6 +21,10 @@ class RDocTocTest < Minitest::Test
     do_good(six_levels_rdoc, 'title.toc', {title: 'Contents'})
   end
 
+  def test_indent
+    do_good(tree_rdoc, 'indentation.toc', {indentation: 2})
+  end
+
   def six_levels_rdoc
     <<-EOT
 = Header 1
@@ -57,7 +61,7 @@ class RDocTocTest < Minitest::Test
       rdoc_file_path = File.join(tmp_dir_path, 'input.rdoc')
       File.write(rdoc_file_path, rdoc_string)
       act_toc_file_path = File.join(tmp_dir_path, 'output.toc')
-      RDocToc.toc(rdoc_file_path, act_toc_file_path, options)
+      RDocToc.toc_file(rdoc_file_path, act_toc_file_path, options)
       assert_files(exp_toc_file_path, act_toc_file_path, exp_toc_file_path)
     end
 
