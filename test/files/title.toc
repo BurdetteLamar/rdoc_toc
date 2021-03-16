@@ -1,7 +1,0 @@
-= Contents
-- {Header 1}[#label-Header+1]
-- {Header 2}[#label-Header+2]
-- {Header 3}[#label-Header+3]
-- {Header 4}[#label-Header+4]
-- {Header 5}[#label-Header+5]
-- {Header 6}[#label-Header+6]

@@ -6,6 +6,46 @@ require 'rdoc_toc/version'
 
 class RDocToc
 
+  def self.toc_lines(rdoc_string, options = {})
+    default_options = {
+      title: nil,
+      indentation: 0,
+      linked_file_path: nil
+    }
+    opts = default_options.merge(options)
+    values = opts.values_at(*default_options.keys)
+    title, indent, linked_file_path = *values
+
+    markup = RDoc::Markup.parse(rdoc_string)
+    doc = RDoc::Markup::Document.new(markup)
+    to_label = RDoc::Markup::ToLabel.new
+
+    toc_lines = []
+    toc_lines.push("= #{title}") if title
+
+    doc.table_of_contents.each do |header|
+      indentation = ' ' * (header.level - 1) * indent
+      # if (indentation.size > 0) || top_bullets
+      bullet = '- '
+      # else
+      #   bullet = ''
+      # end
+
+      text = header.text
+      href = "#label-#{to_label.convert(text)}"
+      href = File.join(linked_file_path, href) if linked_file_path
+      toc_line = "#{indentation}#{bullet}{#{text}}[#{href}]"
+      toc_lines.push(toc_line)
+    end
+    toc_lines.push('')
+    toc_lines
+  end
+
+  def self.toc_string(rdoc_string, options = {})
+    self.toc_lines(rdoc_string, options).join($/)
+  end
+
+
   def self.toc_file(rdoc_file_path, toc_file_path, options = {})
     default_options = {
       title: nil,
@@ -27,7 +67,7 @@ class RDocToc
     doc.table_of_contents.each do |header|
       indentation = ' ' * (header.level - 1) * indent
       # if (indentation.size > 0) || top_bullets
-        bullet = '- '
+      bullet = '- '
       # else
       #   bullet = ''
       # end
