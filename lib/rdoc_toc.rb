@@ -10,12 +10,11 @@ class RDocToc
     default_options = {
       title: nil,
       indentation: 0,
-      top_bullets: false,
       linked_file_path: nil
     }
     opts = default_options.merge(options)
     values = opts.values_at(*default_options.keys)
-    title, indent, top_bullets, linked_file_path = *values
+    title, indent, linked_file_path = *values
 
     rdoc_string = File.read(rdoc_file_path)
     markup = RDoc::Markup.parse(rdoc_string)
@@ -26,13 +25,12 @@ class RDocToc
     toc_lines.push("= #{title}") if title
 
     doc.table_of_contents.each do |header|
-      indentation = '  ' * (header.level - 1) * indent
-      p indentation
-      if (indentation.size > 0) || top_bullets
+      indentation = ' ' * (header.level - 1) * indent
+      # if (indentation.size > 0) || top_bullets
         bullet = '- '
-      else
-        bullet = ''
-      end
+      # else
+      #   bullet = ''
+      # end
 
       text = header.text
       href = "#label-#{to_label.convert(text)}"

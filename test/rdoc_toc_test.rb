@@ -5,6 +5,8 @@ class RDocTocTest < Minitest::Test
     refute_nil ::RDocToc::VERSION
   end
 
+  # No options.
+  #
   def test_empty
     do_good('', 'empty.toc')
   end
@@ -74,6 +76,10 @@ class RDocTocTest < Minitest::Test
     end
     exp_toc = File.read(exp_file_path)
     act_toc = File.read(act_file_path)
+    p 'EXP'
+    puts exp_toc
+    p 'ACT'
+    puts act_toc
     assert_equal(exp_toc, act_toc, file_base_name)
   end
 
