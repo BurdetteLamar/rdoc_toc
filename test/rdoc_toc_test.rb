@@ -75,6 +75,36 @@ class RDocTocTest < Minitest::Test
     do_rdoc('indentation', tree_rdoc, exp_toc_string, {indentation: 2})
   end
 
+  def test_bad_indentation_class
+    e = assert_raises RDocToc::IndentationException do
+      RDocToc.toc_string(tree_rdoc, {indentation: '2'})
+    end
+    assert_match('non-negative', e.message)
+  end
+
+  def test_bad_indentation_value
+    e = assert_raises RDocToc::IndentationException do
+      RDocToc.toc_string(tree_rdoc, {indentation: -1})
+    end
+    assert_match('non-negative', e.message)
+  end
+
+  def test_bad_level_jump
+    rdoc_string = "= Foo\n=== Bar\n"
+    e = assert_raises RDocToc::LevelException do
+      RDocToc.toc_string(rdoc_string)
+    end
+    assert_match('2 or more', e.message)
+  end
+
+  def test_bad_level
+    rdoc_string = "== Foo\n= Bar\n"
+    e = assert_raises RDocToc::LevelException do
+      RDocToc.toc_string(rdoc_string)
+    end
+    assert_match('first seen level', e.message)
+  end
+
   def six_levels_rdoc
     <<-EOT
 = Header 1
