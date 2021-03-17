@@ -22,5 +22,7 @@ Gem::Specification.new do |spec|
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
     `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^test/}) }
   end
+  spec.bindir        = 'bin'
+  spec.executables   = ['rdoc_toc', '_make_toc_file']
   spec.require_paths = ['lib']
 end

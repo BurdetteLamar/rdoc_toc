@@ -11,6 +11,7 @@ class RDocTocTest < Minitest::Test
   end
 
   def test_six_levels
+    rdoc_string = six_levels_rdoc
     exp_toc_string = <<-EOT
 - {Header 1}[#label-Header+1]
 - {Header 2}[#label-Header+2]
@@ -19,7 +20,7 @@ class RDocTocTest < Minitest::Test
 - {Header 5}[#label-Header+5]
 - {Header 6}[#label-Header+6]
     EOT
-    do_rdoc('six_levels', six_levels_rdoc, exp_toc_string, {})
+    do_rdoc('six_levels', rdoc_string, exp_toc_string, {})
   end
 
   def test_tree
@@ -138,6 +139,18 @@ class RDocTocTest < Minitest::Test
   def do_rdoc(name, rdoc_string, exp_toc_string, options = {})
     act_toc_string = RDocToc.toc_string(rdoc_string, options)
     assert_equal(exp_toc_string, act_toc_string, name)
+    Dir.mktmpdir do |dir_path|
+      rdoc_file_path = File.join(dir_path, 't.rdoc')
+      File.write(rdoc_file_path, rdoc_string)
+      toc_file_path = File.join(dir_path, 't.toc')
+      options_string = ''
+      options.each_pair do |name, value|
+        options_string += " --#{name.to_s} #{value}"
+      end
+      command = "rdoc_toc make_toc_file #{rdoc_file_path} #{toc_file_path} #{options_string}"
+      system(command)
+      assert_equal(act_toc_string, File.read(toc_file_path), name)
+    end
   end
 
 end

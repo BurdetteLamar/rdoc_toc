@@ -99,7 +99,7 @@ Level may not be < first seen level:
     toc_lines.push("= #{title}") if title
 
     doc.table_of_contents.each do |header|
-      indentation = ' ' * (header.level - 1) * indent
+      indentation = ' ' * (header.level - 1) * indent.to_i
       # if (indentation.size > 0) || top_bullets
       bullet = '- '
       # else
