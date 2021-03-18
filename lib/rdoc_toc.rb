@@ -18,10 +18,10 @@ class RDocToc
     }
     opts = default_options.merge(options)
     values = opts.values_at(*default_options.keys)
-    title, indent, linked_file_path = *values
+    title, indentation, linked_file_path = *values
 
-    if (!indent.kind_of?(Integer)) || (indent < 0)
-      message = "Option indent must be a non-negative integer, not #{indent}"
+    if (!indentation.kind_of?(Integer)) || (indentation < 0)
+      message = "Option indentation must be a non-negative integer, not #{indentation}"
       raise IndentationException.new(message)
     end
 
@@ -58,7 +58,7 @@ Level may not be < first seen level:
 
 
     headers.each do |header|
-      indentation = ' ' * (header.level - 1) * indent
+      indentation = ' ' * (header.level - 1) * indentation.to_i
       # if (indentation.size > 0) || top_bullets
       bullet = '- '
       # else
@@ -81,39 +81,8 @@ Level may not be < first seen level:
 
 
   def self.toc_file(rdoc_file_path, toc_file_path, options = {})
-    default_options = {
-      title: nil,
-      indentation: 0,
-      linked_file_path: nil
-    }
-    opts = default_options.merge(options)
-    values = opts.values_at(*default_options.keys)
-    title, indent, linked_file_path = *values
-
     rdoc_string = File.read(rdoc_file_path)
-    markup = RDoc::Markup.parse(rdoc_string)
-    doc = RDoc::Markup::Document.new(markup)
-    to_label = RDoc::Markup::ToLabel.new
-
-    toc_lines = []
-    toc_lines.push("= #{title}") if title
-
-    doc.table_of_contents.each do |header|
-      indentation = ' ' * (header.level - 1) * indent.to_i
-      # if (indentation.size > 0) || top_bullets
-      bullet = '- '
-      # else
-      #   bullet = ''
-      # end
-
-      text = header.text
-      href = "#label-#{to_label.convert(text)}"
-      href = File.join(linked_file_path, href) if linked_file_path
-      toc_line = "#{indentation}#{bullet}{#{text}}[#{href}]"
-      toc_lines.push(toc_line)
-    end
-    toc_lines.push('')
-    toc_string = toc_lines.join($/)
+    toc_string = self.toc_string(rdoc_string, options)
     File.write(toc_file_path, toc_string)
   end
 
