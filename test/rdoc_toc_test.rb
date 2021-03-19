@@ -140,8 +140,10 @@ class RDocTocTest < Minitest::Test
   end
 
   def do_make_toc_file(name, rdoc_string, exp_toc_string, options = {})
+    # API
     act_toc_string = RDocToc.toc_string(rdoc_string, options)
     assert_equal(exp_toc_string, act_toc_string, name)
+    # CLI
     Dir.mktmpdir do |dir_path|
       rdoc_file_path = File.join(dir_path, 't.rdoc')
       File.write(rdoc_file_path, rdoc_string)
@@ -158,19 +160,21 @@ class RDocTocTest < Minitest::Test
 
   def do_embed_toc(name, rdoc_string, exp_rdoc_string, options = {})
     Dir.mktmpdir do |dir_path|
+      # API
       rdoc_file_path = File.join(dir_path, 't.rdoc')
       File.write(rdoc_file_path, rdoc_string)
       RDocToc.embed_toc(rdoc_file_path, options)
       act_rdoc_string = File.read(rdoc_file_path)
       assert_equal(exp_rdoc_string, act_rdoc_string, name)
-    #   toc_file_path = File.join(dir_path, 't.toc')
-    #   options_string = ''
-    #   options.each_pair do |name, value|
-    #     options_string += " --#{name.to_s} #{value}"
-    #   end
-    #   command = "rdoc_toc make_toc_file #{rdoc_file_path} #{toc_file_path} #{options_string}"
-    #   system(command)
-    #   assert_equal(act_toc_string, File.read(toc_file_path), name)
+      # CLI
+      toc_file_path = File.join(dir_path, 't.toc')
+      options_string = ''
+      options.each_pair do |name, value|
+        options_string += " --#{name.to_s} #{value}"
+      end
+      command = "rdoc_toc embed_toc #{rdoc_file_path} #{options_string}"
+      system(command)
+      assert_equal(act_rdoc_string, File.read(rdoc_file_path), name)
     end
   end
 
