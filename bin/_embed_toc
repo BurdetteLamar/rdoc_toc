@@ -7,7 +7,6 @@ require 'rdoc_toc'
 options = {
   title: nil,
   indentation: 0,
-  linked_file_path: nil
 }
 
 OptionParser.new do |parser|
@@ -17,16 +16,13 @@ OptionParser.new do |parser|
   parser.on("-i", "--indentation INDENTATION", "TOC indentation") do |indentation|
     options[:indentation] = indentation
   end
-  parser.on("-p", "--linked_file_path LINKED_FILE_PATH", "Path to linked file") do |linked_file_path|
-    options[:linked_file_path] = linked_file_path
-  end
 end.parse!
 
 # Save opts for use below.
 opts = nil
 parser = OptionParser.new do |_opts|
   opts = _opts
-  _opts.banner = "Usage: rdoc_toc make_toc_file [options] rdoc_file_path toc_file_path"
+  _opts.banner = "Usage: rdoc_toc embed_toc [options] rdoc_file_path"
   _opts.on('--help', 'Display help') do
     usage(_opts)
   end
@@ -37,9 +33,7 @@ def usage(opts)
   puts opts
   puts <<-EOT
     
-  where
-    * rdoc_file_path is the path to the file whose TOC file is to be built.
-    * toc_file_path is the path to the TOC file.
+  where rdoc_file_path is the path to the file whose TOC is to be embedded.
 
 EOT
   exit
@@ -47,8 +41,8 @@ end
 
 parser.parse!
 
-_, rdoc_file_path, toc_file_path = ARGV
+_, rdoc_file_path = ARGV
 
-usage(opts) unless ARGV.size == 3
+usage(opts) unless ARGV.size == 2
 
-RDocToc.toc_file(rdoc_file_path, toc_file_path, options)
+RDocToc.embed_toc(rdoc_file_path, options)

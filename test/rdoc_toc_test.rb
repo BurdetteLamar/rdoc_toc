@@ -7,7 +7,8 @@ class RDocTocTest < Minitest::Test
 
   # Default options.
   def test_empty
-    do_rdoc('empty', '', '', {})
+    do_make_toc_file('empty', '', '', {})
+    do_embed_toc('empty', '', '', {})
   end
 
   def test_six_levels
@@ -20,7 +21,7 @@ class RDocTocTest < Minitest::Test
 - {Header 5}[#label-Header+5]
 - {Header 6}[#label-Header+6]
     EOT
-    do_rdoc('six_levels', rdoc_string, exp_toc_string, {})
+    do_make_toc_file('six_levels', rdoc_string, exp_toc_string, {})
   end
 
   def test_tree
@@ -40,7 +41,7 @@ class RDocTocTest < Minitest::Test
 - {Header 2.2.1}[#label-Header+2.2.1]
 - {Header 2.2.2}[#label-Header+2.2.2]
     EOT
-    do_rdoc('tree', tree_rdoc, exp_toc_string, {})
+    do_make_toc_file('tree', tree_rdoc, exp_toc_string, {})
   end
 
   def test_title
@@ -53,7 +54,7 @@ class RDocTocTest < Minitest::Test
 - {Header 5}[#label-Header+5]
 - {Header 6}[#label-Header+6]
     EOT
-    do_rdoc('title', six_levels_rdoc, exp_toc_string, {title: 'Contents'})
+    do_make_toc_file('title', six_levels_rdoc, exp_toc_string, {title: 'Contents'})
   end
 
   def test_indent
@@ -73,7 +74,7 @@ class RDocTocTest < Minitest::Test
     - {Header 2.2.1}[#label-Header+2.2.1]
     - {Header 2.2.2}[#label-Header+2.2.2]
     EOT
-    do_rdoc('indentation', tree_rdoc, exp_toc_string, {indentation: 2})
+    do_make_toc_file('indentation', tree_rdoc, exp_toc_string, {indentation: 2})
   end
 
   def test_bad_indentation_class
@@ -109,6 +110,7 @@ class RDocTocTest < Minitest::Test
   def six_levels_rdoc
     <<-EOT
 = Header 1
+:toc:
 == Header 2
 === Header 3
 ==== Header 4
@@ -119,6 +121,7 @@ class RDocTocTest < Minitest::Test
 
   def tree_rdoc
     <<-EOT
+:toc:
 = Header 1
 == Header 1.1
 === Header 1.1.1
@@ -136,7 +139,7 @@ class RDocTocTest < Minitest::Test
     EOT
   end
 
-  def do_rdoc(name, rdoc_string, exp_toc_string, options = {})
+  def do_make_toc_file(name, rdoc_string, exp_toc_string, options = {})
     act_toc_string = RDocToc.toc_string(rdoc_string, options)
     assert_equal(exp_toc_string, act_toc_string, name)
     Dir.mktmpdir do |dir_path|
@@ -150,6 +153,24 @@ class RDocTocTest < Minitest::Test
       command = "rdoc_toc make_toc_file #{rdoc_file_path} #{toc_file_path} #{options_string}"
       system(command)
       assert_equal(act_toc_string, File.read(toc_file_path), name)
+    end
+  end
+
+  def do_embed_toc(name, rdoc_string, exp_rdoc_string, options = {})
+    Dir.mktmpdir do |dir_path|
+      rdoc_file_path = File.join(dir_path, 't.rdoc')
+      File.write(rdoc_file_path, rdoc_string)
+      RDocToc.embed_toc(rdoc_file_path, options)
+      act_rdoc_string = File.read(rdoc_file_path)
+      assert_equal(exp_rdoc_string, act_rdoc_string, name)
+    #   toc_file_path = File.join(dir_path, 't.toc')
+    #   options_string = ''
+    #   options.each_pair do |name, value|
+    #     options_string += " --#{name.to_s} #{value}"
+    #   end
+    #   command = "rdoc_toc make_toc_file #{rdoc_file_path} #{toc_file_path} #{options_string}"
+    #   system(command)
+    #   assert_equal(act_toc_string, File.read(toc_file_path), name)
     end
   end
 

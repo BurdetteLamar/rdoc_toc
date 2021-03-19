@@ -57,7 +57,6 @@ Level may not be < first seen level:
       end
     end
 
-
     headers.each do |header|
       indent = ' ' * (header.level - 1) * indentation
       bullet = '- '
@@ -75,11 +74,37 @@ Level may not be < first seen level:
     self.toc_lines(rdoc_string, options).join($/)
   end
 
-
   def self.toc_file(rdoc_file_path, toc_file_path, options = {})
     rdoc_string = File.read(rdoc_file_path)
     toc_string = self.toc_string(rdoc_string, options)
     File.write(toc_file_path, toc_string)
   end
 
+  def self.embed_toc(rdoc_file_path, options = {})
+    rdoc_string = File.read(rdoc_file_path)
+    rdoc_lines = rdoc_string.lines.to_a
+    # Find the line with :toc: directive.
+    # # Accumulate all lines following that for toc.
+    toc_line_index = nil
+    toccable_lines = []
+    rdoc_lines.each_with_index do |line, i|
+      if line.match(/:toc:/)
+        toc_line_index = i
+      else
+        toccable_lines.push(line) unless toc_line_index
+      end
+    end
+    unless toc_line_index
+      File.write(rdoc_file_path, rdoc_string)
+      return
+    end
+    # Make and insert toc.
+    toccable_string = toccable_lines.join($/)
+    toc_lines = self.toc_string(toccable_string, options)
+    rdoc_lines.delete_at(toc_line_index)
+    rdoc_lines.insert(toc_line_index, *toc_lines)
+    # Write tocced rdoc.
+    rdoc_string = rdoc_lines.join($/)
+    File.write(rdoc_file_path, rdoc_string)
+  end
 end
