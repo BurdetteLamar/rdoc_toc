@@ -78,7 +78,7 @@ class RDocTocTest < Minitest::Test
 
   def test_bad_indentation_class
     e = assert_raises RDocToc::IndentationException do
-      RDocToc.toc_string(tree_rdoc, {indentation: '2'})
+      RDocToc.toc_string(tree_rdoc, {indentation: false})
     end
     assert_match('non-negative', e.message)
   end

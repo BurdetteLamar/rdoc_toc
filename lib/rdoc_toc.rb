@@ -19,6 +19,7 @@ class RDocToc
     opts = default_options.merge(options)
     values = opts.values_at(*default_options.keys)
     title, indentation, linked_file_path = *values
+    indentation = indentation.to_i if indentation.respond_to?(:to_i)
 
     if (!indentation.kind_of?(Integer)) || (indentation < 0)
       message = "Option indentation must be a non-negative integer, not #{indentation}"
@@ -58,17 +59,12 @@ Level may not be < first seen level:
 
 
     headers.each do |header|
-      indentation = ' ' * (header.level - 1) * indentation.to_i
-      # if (indentation.size > 0) || top_bullets
+      indent = ' ' * (header.level - 1) * indentation
       bullet = '- '
-      # else
-      #   bullet = ''
-      # end
-
       text = header.text
       href = "#label-#{to_label.convert(text)}"
       href = File.join(linked_file_path, href) if linked_file_path
-      toc_line = "#{indentation}#{bullet}{#{text}}[#{href}]"
+      toc_line = "#{indent}#{bullet}{#{text}}[#{href}]"
       toc_lines.push(toc_line)
     end
     toc_lines.push('')
