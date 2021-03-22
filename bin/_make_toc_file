@@ -4,12 +4,7 @@ require 'optparse'
 
 require 'rdoc_toc'
 
-options = {
-  title: nil,
-  indentation: 0,
-  linked_file_path: nil
-}
-
+options = RDocToc::DEFAULT_OPTIONS.dup
 OptionParser.new do |parser|
   parser.on("-t", "--title TITLE", "TOC title") do |title|
     options[:title] = title

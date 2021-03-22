@@ -2,22 +2,21 @@ require 'cgi'
 require 'rdoc'
 require 'rdoc/markup/formatter'
 
-require 'rdoc_toc/version'
-
 class RDocToc
 
   class RDocTocException < StandardError; end
   class LevelException < RDocTocException; end
   class IndentationException < RDocTocException; end
 
+  DEFAULT_OPTIONS = {
+    title: nil,
+    indentation: 2,
+    linked_file_path: nil
+  }
+
   def self.toc_lines(rdoc_string, options = {})
-    default_options = {
-      title: nil,
-      indentation: 0,
-      linked_file_path: nil
-    }
-    opts = default_options.merge(options)
-    values = opts.values_at(*default_options.keys)
+    opts = DEFAULT_OPTIONS.merge(options)
+    values = opts.values_at(*DEFAULT_OPTIONS.keys)
     title, indentation, linked_file_path = *values
     indentation = indentation.to_i if indentation.respond_to?(:to_i)
 
@@ -46,11 +45,12 @@ Level may not be < first seen level:
           EOT
           raise LevelException.new(message)
         end
-        if b.level > a.level + 1
+        if (indentation > 0) && (b.level > a.level + 1)
           message = <<-EOT
   Level may not be 2 or more greater than its predecessor:
     #{a.inspect}
     #{b.inspect}
+  Consider setting indentation to 0.
           EOT
           raise LevelException.new(message)
         end
@@ -88,16 +88,14 @@ Level may not be < first seen level:
     toc_line_index = nil
     toccable_lines = []
     rdoc_lines.each_with_index do |line, i|
-      if line.match(/:toc:/)
+      p [i, line]
+      if line.match(/^:toc:/)
         toc_line_index = i
       else
         toccable_lines.push(line) unless toc_line_index
       end
     end
-    unless toc_line_index
-      File.write(rdoc_file_path, rdoc_string)
-      return
-    end
+    return unless toc_line_index
     # Make and insert toc.
     toccable_string = toccable_lines.join($/)
     toc_lines = self.toc_string(toccable_string, options)
