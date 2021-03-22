@@ -58,7 +58,7 @@ Level may not be < first seen level:
     end
 
     headers.each do |header|
-      indent = ' ' * (header.level - 1) * indentation
+      indent = ' ' * (header.level - first_header.level) * indentation
       bullet = '- '
       text = header.text
       href = "#label-#{to_label.convert(text)}"
@@ -86,23 +86,25 @@ Level may not be < first seen level:
     # Find the line with :toc: directive.
     # # Accumulate all lines following that for toc.
     toc_line_index = nil
+    toc_line_prefix = nil
     toccable_lines = []
     rdoc_lines.each_with_index do |line, i|
-      p [i, line]
-      if line.match(/^:toc:/)
+      line.chomp
+      if line.match(/:toc:/)
         toc_line_index = i
+        toc_line_prefix = line.split(':toc:').first
       else
-        toccable_lines.push(line) unless toc_line_index
+        toccable_lines.push(toc_line_prefix + line) if toc_line_index
       end
     end
     return unless toc_line_index
     # Make and insert toc.
-    toccable_string = toccable_lines.join($/)
-    toc_lines = self.toc_string(toccable_string, options)
+    toccable_string = toccable_lines.join
+    toc_string = self.toc_string(toccable_string, options)
     rdoc_lines.delete_at(toc_line_index)
-    rdoc_lines.insert(toc_line_index, *toc_lines)
+    rdoc_lines.insert(toc_line_index, toc_string)
     # Write tocced rdoc.
-    rdoc_string = rdoc_lines.join($/)
+    rdoc_string = rdoc_lines.join
     File.write(rdoc_file_path, rdoc_string)
   end
 end

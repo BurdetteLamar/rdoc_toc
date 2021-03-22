@@ -16,7 +16,7 @@ class RDocTocTest < Minitest::Test
 
   def test_six_levels
     rdoc_string = six_levels_rdoc
-    exp_toc_string = <<-EOT
+    exp_toc_file_string = <<-EOT
 - {Header 1}[#label-Header+1]
   - {Header 2}[#label-Header+2]
     - {Header 3}[#label-Header+3]
@@ -24,8 +24,21 @@ class RDocTocTest < Minitest::Test
         - {Header 5}[#label-Header+5]
           - {Header 6}[#label-Header+6]
     EOT
-    make_toc_file('six_levels', rdoc_string, exp_toc_string, {})
-    # embed_toc('six_levels', rdoc_string, exp_toc_string, {})
+    make_toc_file('six_levels', rdoc_string, exp_toc_file_string, {})
+    exp_toc_embedded_string = <<-EOT
+= Header 1
+- {Header 2}[#label-Header+2]
+  - {Header 3}[#label-Header+3]
+    - {Header 4}[#label-Header+4]
+      - {Header 5}[#label-Header+5]
+        - {Header 6}[#label-Header+6]
+== Header 2
+=== Header 3
+==== Header 4
+===== Header 5
+====== Header 6
+    EOT
+    embed_toc('six_levels', rdoc_string, exp_toc_embedded_string, {})
   end
 
   def test_tree
