@@ -42,7 +42,8 @@ class RDocTocTest < Minitest::Test
   end
 
   def test_tree
-    exp_toc_string = <<-EOT
+    rdoc_string = tree_rdoc
+    exp_toc_file_string = <<-EOT
 - {Header 1}[#label-Header+1]
   - {Header 1.1}[#label-Header+1.1]
     - {Header 1.1.1}[#label-Header+1.1.1]
@@ -58,7 +59,38 @@ class RDocTocTest < Minitest::Test
     - {Header 2.2.1}[#label-Header+2.2.1]
     - {Header 2.2.2}[#label-Header+2.2.2]
     EOT
-    make_toc_file('tree', tree_rdoc, exp_toc_string, {})
+    make_toc_file('tree', rdoc_string, exp_toc_file_string, {})
+    exp_toc_embedded_string = <<-EOT
+- {Header 1}[#label-Header+1]
+  - {Header 1.1}[#label-Header+1.1]
+    - {Header 1.1.1}[#label-Header+1.1.1]
+    - {Header 1.1.2}[#label-Header+1.1.2]
+  - {Header 1.2}[#label-Header+1.2]
+    - {Header 1.2.1}[#label-Header+1.2.1]
+    - {Header 1.2.2}[#label-Header+1.2.2]
+- {Header 2}[#label-Header+2]
+  - {Header 2.1}[#label-Header+2.1]
+    - {Header 2.1.1}[#label-Header+2.1.1]
+    - {Header 2.1.2}[#label-Header+2.1.2]
+  - {Header 2.2}[#label-Header+2.2]
+    - {Header 2.2.1}[#label-Header+2.2.1]
+    - {Header 2.2.2}[#label-Header+2.2.2]
+= Header 1
+== Header 1.1
+=== Header 1.1.1
+=== Header 1.1.2
+== Header 1.2
+=== Header 1.2.1
+=== Header 1.2.2
+= Header 2
+== Header 2.1
+=== Header 2.1.1
+=== Header 2.1.2
+== Header 2.2
+=== Header 2.2.1
+=== Header 2.2.2
+    EOT
+    embed_toc('six_levels', rdoc_string, exp_toc_embedded_string, {})
   end
 
   def test_title
